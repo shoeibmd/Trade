@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="500" height="120">
+  <rect width="500" height="120" rx="12" fill="#0B132B"/>
+  <g transform="translate(20, 20)">
+    <!-- Stylized Geometric 'A' with trend line and constellation star -->
+    <path d="M 20 75 L 45 15 L 70 75 L 56 75 L 45 38 L 34 75 Z" fill="#00F0FF"/>
+    <path d="M 30 55 L 60 55 L 75 30 L 90 42" fill="none" stroke="#7000FF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="90" cy="42" r="5" fill="#00F0FF"/>
+  </g>
+  <!-- Brand Typography -->
+  <text x="130" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="800" fill="#FFFFFF" letter-spacing="1">ASTRAEA <tspan fill="#00F0FF">MT5</tspan></text>
+  <text x="130" y="88" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="500" fill="#8D99AE" letter-spacing="1.5">AI-POWERED FOREX TRADING INTELLIGENCE</text>
+</svg>
