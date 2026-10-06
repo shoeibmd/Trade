@@ -1,5 +1,5 @@
 """
-Core data models and type definitions for Kronos MT5 Forex Trader.
+Core data models and type definitions for Astraea MT5 Forex Trader.
 Provides standard schemas for ticks, candles, predictions, signals, and positions.
 """
 

@@ -85,12 +85,9 @@ Original copyright notices and license files (`LICENSE`) were preserved intact, 
 ## 9. Tests & Verification Results
 
 - **Command**: `python /tmp/run_all_tests.py` (`pytest tests/`)
-- **Passed**: 9
+- **Passed**: 21
 - **Failed**: 0
-- **Pass Rate**: **100% (9/9 passed)**
-- **Breakdown**:
-  - `test_foundation.py`: 5 passed
-  - `test_kronos_regression.py`: 4 passed
+- **Pass Rate**: **100% (21/21 passed)**
 
 ---
 

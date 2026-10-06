@@ -298,10 +298,10 @@ def create_prediction_chart(df, pred_df, lookback, pred_len, actual_df=None, his
 
     # Update layout
     fig.update_layout(
-        title='Astraea MT5 Forecast Results - 400 Historical Points + 120 Prediction Points vs 120 Actual Points',
+        title='Kronos Financial Prediction Results - 400 Historical Points + 120 Prediction Points vs 120 Actual Points',
         xaxis_title='Time',
         yaxis_title='Price',
-        template='plotly_dark',
+        template='plotly_white',
         height=600,
         showlegend=True
     )
@@ -698,10 +698,10 @@ def get_model_status():
         })
 
 if __name__ == '__main__':
-    print("Starting Astraea MT5 Web Dashboard...")
-    print(f"Forecasting engine availability: {MODEL_AVAILABLE}")
+    print("Starting Kronos Web UI...")
+    print(f"Model availability: {MODEL_AVAILABLE}")
     if MODEL_AVAILABLE:
-        print("Tip: You can load the forecasting engine through /api/load-model endpoint")
+        print("Tip: You can load Kronos model through /api/load-model endpoint")
     else:
         print("Tip: Will use simulated data for demonstration")
 

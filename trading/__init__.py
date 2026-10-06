@@ -1,3 +1,3 @@
 """
-Trading module foundation for Kronos MT5 Forex Trader.
+Trading module foundation for Astraea MT5.
 """
