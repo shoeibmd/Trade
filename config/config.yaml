@@ -1,0 +1,28 @@
+system:
+  mode: PAPER
+  log_level: INFO
+
+mt5:
+  symbols:
+    - EURUSD
+  timeframe: M5
+
+kronos:
+  model_name: NeoQuasar/Kronos-small
+  tokenizer_name: NeoQuasar/Kronos-Tokenizer-base
+  max_context: 512
+  lookback: 400
+  pred_len: 120
+  device: cpu
+
+strategy:
+  minimum_signal_score: 70
+
+risk:
+  risk_per_trade_percent: 1.0
+  max_open_positions: 1
+  max_daily_loss_percent: 3.0
+  max_consecutive_losses: 3
+
+safety:
+  live_trading_enabled: false
