@@ -15,6 +15,16 @@ kronos:
   pred_len: 120
   device: cpu
 
+indicators:
+  ema_fast: 9
+  ema_slow: 21
+  ema_trend: 50
+  ema_baseline: 200
+  rsi_period: 14
+  adx_period: 14
+  atr_period: 14
+  swing_window: 5
+
 strategy:
   minimum_signal_score: 70
 
