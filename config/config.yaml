@@ -25,6 +25,16 @@ indicators:
   atr_period: 14
   swing_window: 5
 
+signal:
+  minimum_signal_score: 70
+  weights:
+    kronos: 35
+    trend: 20
+    ema: 15
+    rsi: 10
+    adx: 10
+    market_structure: 10
+
 strategy:
   minimum_signal_score: 70
 
@@ -33,6 +43,25 @@ risk:
   max_open_positions: 1
   max_daily_loss_percent: 3.0
   max_consecutive_losses: 3
+  reward_risk_ratio: 1.5
+
+paper:
+  initial_balance: 10000.0
+  spread_points: 0
+  slippage_points: 0
+
+demo:
+  demo_trading_enabled: false
+  verify_demo_account: true
+  allowed_trade_types:
+    - DEMO
+
+position_management:
+  breakeven_r_multiple: 1.0
+  breakeven_offset_points: 10
+  trailing_stop_atr_multiplier: 1.5
+  trailing_stop_activation_r_multiple: 1.2
+  polling_interval_seconds: 5
 
 safety:
   live_trading_enabled: false
