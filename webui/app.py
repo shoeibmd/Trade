@@ -4,7 +4,7 @@ import numpy as np
 import json
 import plotly.graph_objects as go
 import plotly.utils
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_cors import CORS
 import sys
 import warnings
@@ -298,7 +298,7 @@ def create_prediction_chart(df, pred_df, lookback, pred_len, actual_df=None, his
 
     # Update layout
     fig.update_layout(
-        title='Kronos Financial Prediction Results - 400 Historical Points + 120 Prediction Points vs 120 Actual Points',
+        title='Astraea MT5 Financial Forecast Results - 400 Historical Points + 120 Prediction Points vs 120 Actual Points',
         xaxis_title='Time',
         yaxis_title='Price',
         template='plotly_white',
@@ -331,6 +331,12 @@ def create_prediction_chart(df, pred_df, lookback, pred_len, actual_df=None, his
 def index():
     """Home page"""
     return render_template('index.html')
+
+@app.route('/assets/branding/<path:filename>')
+def serve_branding_assets(filename):
+    """Serve branding assets"""
+    assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets', 'branding')
+    return send_from_directory(assets_dir, filename)
 
 @app.route('/api/data-files')
 def get_data_files():
@@ -698,7 +704,7 @@ def get_model_status():
         })
 
 if __name__ == '__main__':
-    print("Starting Kronos Web UI...")
+    print("Starting Astraea MT5 Web UI...")
     print(f"Model availability: {MODEL_AVAILABLE}")
     if MODEL_AVAILABLE:
         print("Tip: You can load Kronos model through /api/load-model endpoint")

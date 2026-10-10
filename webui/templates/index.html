@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kronos Financial Prediction Web UI</title>
+    <title>Astraea MT5 — AI-Powered Forex Trading Intelligence</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -41,6 +41,12 @@
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+        }
+
+        .header-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
         }
 
         .main-content {
@@ -441,8 +447,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Kronos Financial Prediction Web UI</h1>
-            <p>AI-based financial K-line data prediction analysis platform</p>
+            <img src="/assets/branding/astraea_logo.png" alt="Astraea MT5 Logo" class="header-logo" onerror="this.style.display='none'">
+            <h1>Astraea MT5 — AI-Powered Forex Trading Intelligence</h1>
+            <p>Institutional AI-Powered MetaTrader 5 Forex Forecasting & Trading Intelligence Platform</p>
         </div>
 
         <div class="main-content">
@@ -455,7 +462,7 @@
                     <select id="model-select">
                         <option value="">Please load available models first</option>
                     </select>
-                    <small class="form-text">Select the Kronos model to use</small>
+                    <small class="form-text">Select the Kronos foundation forecasting model to use</small>
                 </div>
 
                 <!-- Device Selection -->
@@ -647,7 +654,7 @@
 
         // Initialize application
         async function initializeApp() {
-            console.log('🚀 Initializing Kronos Web UI...');
+            console.log('🚀 Initializing Astraea MT5 Web UI...');
 
             // Load available models
             await loadAvailableModels();
