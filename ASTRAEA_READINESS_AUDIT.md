@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-A comprehensive read-only project readiness audit of the **Astraea MT5** repository was conducted. The audit verified system architecture across MT5 data handling, foundation model integration (`KronosPredictor`), technical indicator filters, signal generation, risk management, paper execution, backtesting, and dashboard visualization.
+A comprehensive readiness audit of the **Astraea MT5** repository was conducted. System architecture was verified across MT5 data handling, foundation model integration (`KronosPredictor`), technical indicator filters, signal generation, risk management, paper execution, backtesting, and dashboard visualization.
 
 **Key Safety Confirmation**:
 - `system.mode`: Default set to `PAPER`.
@@ -17,35 +17,27 @@ A comprehensive read-only project readiness audit of the **Astraea MT5** reposit
 
 ---
 
-## 2. Prioritized Audit Findings
+## 2. Audit Findings & Resolution Status
 
 ### Critical Priority
 - **Finding C-1: Linux MT5 Native Connection Limitation**
-  - **Description**: MetaTrader 5 Python API (`MetaTrader5`) is natively compiled for Windows. In Linux/Docker environments, direct connection requires Wine/MT5 terminal wrapper or mock data bridges.
-  - **Affected File**: `trading/mt5_connection.py` (or connection module)
-  - **Impact**: Execution against live MT5 terminal on Linux host requires bridge proxy.
-  - **Recommendation**: Implement robust HTTP/gRPC bridge wrapper or MetaTrader 5 Web API gateway for non-Windows environments.
+  - **Status**: **RESOLVED IN PHASE 15 (Gateway Mode)**
+  - **Description**: MetaTrader 5 Python API (`MetaTrader5`) is natively compiled for Windows.
+  - **Resolution**: Implemented `MT5GatewayClient` in `trading/mt5_connection.py` supporting authenticated REST/JSON gateway access (`X-MT5-API-Key`, timeouts, exponential backoff retries) for Linux/Docker environments, with native mode fallback on Windows. Real Windows terminal verification is tracked as `PENDING_WINDOWS_TERMINAL`.
 
 ### High Priority
 - **Finding H-1: Forex Tick Volume Discrepancy**
-  - **Description**: Forex brokers provide tick volume (number of price updates) rather than exchange volume/amount.
-  - **Affected File**: `trading/kronos_adapter.py`, `trading/mt5_data.py`
-  - **Impact**: Raw volume/amount inputs to foundation models trained on stock exchange data require windowed z-score scaling or zero-imputation (`prediction_wo_vol_example.py`).
-  - **Recommendation**: Standardize z-score normalization on `tick_volume` in `KronosForexAdapter`.
+  - **Status**: **RESOLVED IN PHASE 15 (Configurable Scaling)**
+  - **Description**: Forex brokers provide tick volume rather than exchange contract volume.
+  - **Resolution**: Implemented opt-in, windowed z-score tick-volume preprocessing in `KronosForexAdapter` (`trading/kronos_adapter.py`) with zero-variance protection and configurable `[-5.0, 5.0]` clipping.
 
 ### Medium Priority
 - **Finding M-1: Test Suite Coverage Scope**
-  - **Description**: Standard `pytest tests/` focuses on core foundation model regression (`test_kronos_regression.py`). Live MT5 socket tests require optional MT5 server endpoints.
-  - **Affected File**: `tests/` directory
-  - **Impact**: Live broker execution paths are mocked in CI/CD environments.
-  - **Recommendation**: Maintain separate integration test suite with synthetic MT5 socket mock servers.
+  - **Status**: Implemented mock integration test suite in `tests/test_mt5_connection.py` and `tests/test_mt5_data.py`.
 
 ### Low Priority
 - **Finding L-1: UI Dashboard Session Persistence**
-  - **Description**: Web UI prediction states are saved to `webui/prediction_results/*.json` on disk rather than a structured database (e.g., SQLite/PostgreSQL).
-  - **Affected File**: `webui/app.py`
-  - **Impact**: Large scale prediction history accumulation on local file system over long execution runs.
-  - **Recommendation**: Add SQLite persistence layer for historical signal tracking in future phases.
+  - **Status**: Open (Local JSON saved to `webui/prediction_results/*.json`).
 
 ---
 
@@ -54,7 +46,7 @@ A comprehensive read-only project readiness audit of the **Astraea MT5** reposit
 | Component | Status | Verification Context | Readiness Level |
 |---|---|---|---|
 | **Kronos Foundation Model** | Intact | PyTorch 2.14.1+cu130 / CPU / CUDA | **Production Ready** |
-| **MT5 Data Engine** | Implemented | Mock & Rate Structures | **Ready for Demo Bridge** |
+| **MT5 Data Engine** | Implemented | Dual-mode (Native / Gateway Client) | **Phase 15 Resolved (Gateway)** |
 | **Forex Risk Manager** | Implemented | Account Equity & SL Distance | **Production Ready** |
 | **Paper Execution Engine** | Implemented | Local Paper Simulator | **Production Ready** |
 | **Live Order Execution** | Disabled | Enforced Safety Override (`false`) | **Safely Disabled** |

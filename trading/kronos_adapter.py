@@ -49,6 +49,8 @@ class KronosAdapter:
         max_context: int = 512,
         lookback: int = 400,
         pred_len: int = 120,
+        normalize_tick_volume: bool = False,
+        volume_clip_range: Tuple[float, float] = (-5.0, 5.0),
     ):
         self.model_name = model_name or "NeoQuasar/Kronos-small"
         self.tokenizer_name = tokenizer_name or "NeoQuasar/Kronos-Tokenizer-base"
@@ -56,6 +58,8 @@ class KronosAdapter:
         self.max_context = max_context
         self.lookback = lookback
         self.pred_len = pred_len
+        self.normalize_tick_volume = normalize_tick_volume
+        self.volume_clip_range = volume_clip_range
 
         self.tokenizer: Optional[KronosTokenizer] = None
         self.model: Optional[Kronos] = None
@@ -79,6 +83,7 @@ class KronosAdapter:
                         self.max_context = kcfg.get("max_context", self.max_context)
                         self.lookback = kcfg.get("lookback", self.lookback)
                         self.pred_len = kcfg.get("pred_len", self.pred_len)
+                        self.normalize_tick_volume = kcfg.get("normalize_tick_volume", self.normalize_tick_volume)
             except Exception as e:
                 logger.error(f"Failed to parse Kronos config from {config_path}: {e}")
 
@@ -156,9 +161,24 @@ class KronosAdapter:
         # Extract last `lookback` closed candles to prevent look-ahead
         context_df = df.iloc[-self.lookback:].copy().reset_index(drop=True)
 
-        # Prepare volume / amount channels without altering values
+        # Prepare volume / amount channels safely
         if "volume" not in context_df.columns:
             context_df["volume"] = 0.0
+        else:
+            context_df["volume"] = context_df["volume"].fillna(0.0)
+
+        # Configurable Forex tick-volume preprocessing
+        if self.normalize_tick_volume:
+            vol = context_df["volume"].values
+            mean_vol = np.mean(vol)
+            std_vol = np.std(vol)
+            if std_vol > 1e-6:
+                norm_vol = (vol - mean_vol) / (std_vol + 1e-5)
+                clipped_vol = np.clip(norm_vol, self.volume_clip_range[0], self.volume_clip_range[1])
+                context_df["volume"] = clipped_vol
+            else:
+                context_df["volume"] = 0.0
+
         if "amount" not in context_df.columns:
             context_df["amount"] = context_df["volume"] * context_df[["open", "high", "low", "close"]].mean(axis=1)
 
