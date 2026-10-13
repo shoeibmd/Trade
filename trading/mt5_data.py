@@ -157,6 +157,12 @@ class MT5DataEngine:
         )
         return output_df, val_res
 
+    def validate_data(
+        self, df: pd.DataFrame, min_candles: int = 400, expected_timeframe: str = "M5"
+    ) -> ValidationResult:
+        """Alias for validate_bar_dataframe to maintain contract compatibility across modules."""
+        return self.validate_bar_dataframe(df, expected_count=min_candles, expected_timeframe=expected_timeframe)
+
     def validate_bar_dataframe(
         self, df: pd.DataFrame, expected_count: int = 400, expected_timeframe: str = "M5"
     ) -> ValidationResult:
