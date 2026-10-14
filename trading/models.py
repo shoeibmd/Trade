@@ -15,6 +15,10 @@ class SignalType(Enum):
     HOLD = "HOLD"
 
 
+# Alias for backward compatibility
+SignalDirection = SignalType
+
+
 class TradingMode(Enum):
     PAPER = "PAPER"
     LIVE = "LIVE"
