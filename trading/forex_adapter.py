@@ -25,6 +25,52 @@ class KronosAdapterError(Exception):
     pass
 
 
+class AstraeaForecastingEngine:
+    """
+    High-level user-facing forecasting interface for Astraea MT5.
+    Wraps KronosAdapter and provides clean, product-native forecast generation.
+    """
+
+    def __init__(
+        self,
+        model_name: Optional[str] = "NeoQuasar/Kronos-small",
+        tokenizer_name: Optional[str] = "NeoQuasar/Kronos-Tokenizer-base",
+        device: str = "cpu",
+        max_context: int = 512,
+        lookback: int = 400,
+        pred_len: int = 120,
+    ):
+        self.adapter = KronosAdapter(
+            model_name=model_name,
+            tokenizer_name=tokenizer_name,
+            device=device,
+            max_context=max_context,
+            lookback=lookback,
+            pred_len=pred_len,
+        )
+
+    def load(self) -> Tuple[bool, str]:
+        """Loads underlying forecasting model weights."""
+        return self.adapter.load_model()
+
+    def forecast(
+        self,
+        df: pd.DataFrame,
+        symbol: str = "EURUSD",
+        timeframe: str = "M5",
+        temperature: float = 1.0,
+        sample_count: int = 1,
+    ) -> Tuple[Optional[PredictionResult], Optional[str]]:
+        """Generates market forecast for input DataFrame."""
+        return self.adapter.predict_forecast(
+            df=df,
+            symbol=symbol,
+            timeframe=timeframe,
+            temperature=temperature,
+            sample_count=sample_count,
+        )
+
+
 class KronosAdapter:
     """
     Application-level adapter connecting Astraea MT5 to the underlying Kronos foundation model.

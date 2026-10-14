@@ -14,18 +14,18 @@
 
 <p align="center">
 
-<img src="./assets/branding/astraea_logo.png" width="120" alt="Astraea MT5 Logo">
+<img src="./assets/branding/logo.svg" width="380" alt="Astraea MT5 Logo">
 
 </p>
 
 > **Astraea MT5** is an enterprise-grade AI-powered MetaTrader 5 (MT5) Forex trading intelligence platform.
-> It integrates real-time MT5 tick and bar streaming data, technical indicators, probabilistic signal generation, risk management, and execution engines.
+> Astraea MT5 uses its integrated forecasting engine to generate market forecasts.
 
 ---
 
-### 📌 Model & Foundation Architecture Notice
+### 📌 Architecture & Model Attribution Notice
 
-> **Note**: **Astraea MT5** is the trading application and execution framework. It uses the existing **Kronos** foundation forecasting model (`Kronos`, `KronosTokenizer`, `KronosPredictor`) as its core time-series forecasting component. Original Kronos model architecture, tokenization, weights, citations, and licenses remain intact.
+> **Note**: **Astraea MT5** is the trading application and execution framework. It integrates the underlying foundation forecasting model as its time-series forecasting component. Upstream research citations, model weights, and licenses remain preserved.
 
 ---
 
@@ -35,7 +35,7 @@ Astraea MT5 provides a complete 5-layer trading architecture built for high-prec
 
 1. **Layer 1: MT5 Data Infrastructure Layer** (`MT5DataEngine`, `DataValidator`)
    - Real-time rate collection, candle aggregation, and missing bar cleaning.
-2. **Layer 2: AI Foundation Model Layer** (`KronosForexAdapter`, `KronosPredictor`, `KronosTokenizer`)
+2. **Layer 2: AI Foundation Forecasting Engine Layer** (`AstraeaForecastingEngine`, `KronosAdapter`)
    - Pretrained autoregressive foundation model for OHLCV K-line sequences.
 3. **Layer 3: Strategy & Intelligence Layer** (`IndicatorEngine`, `ForexSignalEngine`)
    - Directional forecasts combined with ATR, RSI, EMA, and Bollinger Band filters.
@@ -64,30 +64,52 @@ To launch the Astraea MT5 Web UI Dashboard:
 python webui/app.py
 ```
 
-Then open your browser at `http://localhost:5000`.
+Then open your browser at `http://localhost:7070` (or `http://localhost:5000` if configured).
 
 ---
 
-## 📈 Making Forecasts using the Kronos Foundation Model
+## 📈 Making Forecasts Using the Astraea MT5 Forecasting Engine
 
-Forecasting in Astraea MT5 leverages the underlying `KronosPredictor` class.
+Generating forecasts in Astraea MT5 is straightforward using the high-level `AstraeaForecastingEngine` class.
 
 ```python
-from model import Kronos, KronosTokenizer, KronosPredictor
+import pandas as pd
+from trading import AstraeaForecastingEngine
 
-# Load foundation model and tokenizer
-tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
-model = Kronos.from_pretrained("NeoQuasar/Kronos-small")
+# Initialize the Astraea MT5 Forecasting Engine
+engine = AstraeaForecastingEngine(
+    model_name="NeoQuasar/Kronos-small",
+    device="cpu",
+    lookback=400,
+    pred_len=120
+)
 
-# Initialize predictor
-predictor = KronosPredictor(model, tokenizer, max_context=512)
+# Load model weights
+engine.load()
+
+# Prepare historical closed candles DataFrame
+# df must contain columns ['open', 'high', 'low', 'close', 'timestamps']
+df = pd.read_csv("./data/XSHG_5min_600977.csv")
+df['timestamps'] = pd.to_datetime(df['timestamps'])
+
+# Generate market forecast
+prediction, error = engine.forecast(
+    df=df,
+    symbol="EURUSD",
+    timeframe="M5",
+    temperature=1.0
+)
+
+if prediction:
+    print(f"Generated {prediction.pred_len}-step forecast for {prediction.symbol}")
+    print("Predicted Close Prices:", prediction.predicted_close[:5])
 ```
 
 ---
 
 ## 📖 Upstream Model Citation & Acknowledgments
 
-The core forecasting engine in Astraea MT5 relies on the Kronos foundation model research:
+The core foundation forecasting research integrated in Astraea MT5 is cited below:
 
 ```bibtex
 @misc{shi2025kronos,
