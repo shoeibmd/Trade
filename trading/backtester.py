@@ -16,7 +16,7 @@ import yaml
 
 from trading.models import SignalType, PredictionResult
 from trading.mt5_data import MT5DataEngine, ValidationResult
-from trading.kronos_adapter import KronosAdapter
+from trading.forex_adapter import KronosAdapter
 from trading.indicators import TechnicalIndicatorEngine
 from trading.signal_engine import SignalEngine, SignalResult
 from trading.risk_manager import RiskManager, RiskDecision, AccountState, SymbolSpecification

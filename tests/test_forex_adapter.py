@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from trading.kronos_adapter import KronosAdapter
+from trading.forex_adapter import KronosAdapter
 from trading.models import PredictionResult
 
 

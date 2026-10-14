@@ -1,4 +1,4 @@
-# Astraea MT5 — Branding Audit & Verification Report
+# Astraea MT5 — Branding & Controlled Rename Audit Report
 
 **Date**: October 6, 2026
 **Application Name**: Astraea MT5 — AI-Powered Forex Trading Intelligence
@@ -10,11 +10,17 @@
 
 ## 1. Executive Summary
 
-A comprehensive repository-wide rebranding audit was conducted to establish **Astraea MT5** as the primary user-facing trading application while maintaining full upstream attribution and technical integrity of the underlying **Kronos** foundation forecasting model.
+A controlled rename and audit was executed to standardize the product identity as **Astraea MT5 — AI-Powered Forex Trading Intelligence**.
 
-All modifications preserve:
+### Controlled Renames Applied (Phase 1 Approved):
+- `trading/kronos_adapter.py` → `trading/forex_adapter.py`
+- `tests/test_kronos_adapter.py` → `tests/test_forex_adapter.py`
+- Updated dependent module imports in `trading/backtester.py`, `tests/test_mt5_data.py`, and `tests/test_forex_adapter.py`.
+
+### Unchanged Protected Components (Phase 2 Preserved):
 - `model/kronos.py`, `model/module.py`, `model/__init__.py`
-- Pretrained model class structures (`Kronos`, `KronosTokenizer`, `KronosPredictor`)
+- `tests/test_kronos_regression.py`
+- Pretrained model class names (`Kronos`, `KronosTokenizer`, `KronosPredictor`)
 - Hugging Face model identifiers (`NeoQuasar/Kronos-small`, `NeoQuasar/Kronos-base`, etc.)
 - Paper citations and upstream MIT License
 - Safe system settings (`live_trading_enabled: false`, `system.mode: PAPER`)
@@ -23,53 +29,37 @@ All modifications preserve:
 
 ## 2. Updated Files Summary
 
-| File | Purpose | User-Facing Rebranding Applied |
+| File Path | Action | Purpose |
 |---|---|---|
-| `README.md` | Primary Application README | Updated main heading, badge titles, product overview, setup guide, and explicit model attribution notice. |
-| `webui/templates/index.html` | Web Dashboard HTML Interface | Updated page title, header, subtitle, logo reference, and console logs. |
-| `webui/app.py` | Web Dashboard Backend | Added branding asset route, updated chart titles and startup logs. |
-| `webui/README.md` | Web UI Documentation | Rebranded to Astraea MT5 Web UI with explicit Kronos foundation model notes. |
-| `assets/branding/astraea_logo.png` | Product Logo Asset | Added Astraea MT5 logo asset for web dashboard and documentation. |
+| `trading/forex_adapter.py` | Renamed from `trading/kronos_adapter.py` | Application adapter interfacing MT5 bar data with Kronos foundation model. |
+| `tests/test_forex_adapter.py` | Renamed from `tests/test_kronos_adapter.py` | Unit test suite for Forex adapter. |
+| `trading/backtester.py` | Import Updated | Imports `KronosAdapter` from `trading.forex_adapter`. |
+| `tests/test_mt5_data.py` | Import Updated | Imports `KronosAdapter` from `trading.forex_adapter`. |
+| `README.md` | Product Branding Verified | Astraea MT5 product branding and Kronos attribution. |
+| `webui/templates/index.html` | UI Branding Verified | Astraea MT5 dashboard header, titles, and logo banner. |
+| `webui/app.py` | Web Backend Verified | Branding asset serving and startup logs. |
 
 ---
 
-## 3. Preserved Technical Kronos References
+## 3. Preserved Historical & Model References (Phase 3 Preserved)
 
-The following technical references were intentionally preserved to ensure zero breakage of model loading, inference pipelines, and automated test suites:
-
-1. **Core Model Source Files**:
-   - `model/kronos.py`
-   - `model/module.py`
-   - `model/__init__.py`
-
-2. **Python Classes & Functions**:
-   - `Kronos`
-   - `KronosTokenizer`
-   - `KronosPredictor`
-   - `auto_regressive_inference`
-   - `get_model_class`
-
-3. **Hugging Face Checkpoint Identifiers**:
-   - `NeoQuasar/Kronos-mini`
-   - `NeoQuasar/Kronos-small`
-   - `NeoQuasar/Kronos-base`
-   - `NeoQuasar/Kronos-Tokenizer-base`
-   - `NeoQuasar/Kronos-Tokenizer-2k`
-
-4. **Upstream Research & Legal Attribution**:
-   - Paper citation: `Kronos: A Foundation Model for the Language of Financial Markets` (Shi et al., AAAI 2026 / arXiv 2508.02739).
-   - MIT License headers and original copyright attributions.
+The following files were intentionally preserved without renaming to maintain historical accuracy and compatibility:
+- `PHASE_0_ANALYSIS_REPORT.md` (Phase 0 repository trace document)
+- `PHASE_4_FORECASTING_REPORT.md` (Phase 4 model report)
+- `examples/run_backtest_kronos.py` (Stock backtesting example script)
+- `examples/kronos_demo.py` (Demo script)
+- `examples/yuce/run_backtest_kronos_output.json` (Historical report output)
 
 ---
 
 ## 4. Test & Safety Verification
 
-- **Test Suite Executed**: `python /tmp/run_all_tests.py` / `pytest tests/test_kronos_regression.py`
-- **Result**: 4 passed, 0 failed.
-- **Safety Flags**:
+- **Test Suite Executed**: `pytest tests/test_forex_adapter.py tests/test_mt5_data.py tests/test_mt5_connection.py tests/test_kronos_regression.py`
+- **Result**: **9 passed, 0 failed (100% pass rate)**.
+- **Safety Flags Enforced**:
   - `system.mode`: `PAPER`
   - `live_trading_enabled`: `false`
 
 ---
 
-*End of Branding Audit Report.*
+*End of Branding & Controlled Rename Audit Report.*

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 import pytest
-from trading.kronos_adapter import KronosAdapter
+from trading.forex_adapter import KronosAdapter
 
 
 def test_kronos_adapter_tick_volume_normalization():
