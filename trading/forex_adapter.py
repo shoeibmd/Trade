@@ -5,6 +5,7 @@ and adapts validated MT5 market bar DataFrames into structured PredictionResults
 """
 
 from datetime import datetime, timedelta
+import hashlib
 import logging
 from pathlib import Path
 import time
@@ -111,6 +112,41 @@ class KronosAdapter:
         self.model: Optional[Kronos] = None
         self.predictor: Optional[KronosPredictor] = None
         self.is_loaded: bool = False
+        self._cache: Dict[str, PredictionResult] = {}
+        self.cache_enabled: bool = True
+        self.max_cache_entries: int = 256
+
+    def clear_cache(self) -> None:
+        """Clears all in-memory forecast cache entries."""
+        self._cache.clear()
+
+    def _compute_cache_key(
+        self,
+        df: pd.DataFrame,
+        symbol: str,
+        timeframe: str,
+        temperature: float,
+        top_k: int,
+        top_p: float,
+        sample_count: int,
+    ) -> str:
+        # Build deterministic hash of input context window OHLCV + timestamps + params
+        hasher = hashlib.sha256()
+        hasher.update(symbol.encode("utf-8"))
+        hasher.update(timeframe.encode("utf-8"))
+        hasher.update(f"{temperature}:{top_k}:{top_p}:{sample_count}:{self.normalize_tick_volume}:{self.pred_len}:{self.lookback}".encode("utf-8"))
+
+        # Hash last lookback rows of DataFrame content
+        sub_df = df.iloc[-self.lookback:]
+        ts_str = "".join(sub_df["timestamps"].astype(str).tolist())
+        hasher.update(ts_str.encode("utf-8"))
+
+        for col in ["open", "high", "low", "close", "volume"]:
+            if col in sub_df.columns:
+                vals_bytes = sub_df[col].to_numpy(dtype=np.float64).tobytes()
+                hasher.update(vals_bytes)
+
+        return hasher.hexdigest()
 
         if config_path:
             self._load_config(config_path)
@@ -228,6 +264,22 @@ class KronosAdapter:
         if "amount" not in context_df.columns:
             context_df["amount"] = context_df["volume"] * context_df[["open", "high", "low", "close"]].mean(axis=1)
 
+        # Check cache if enabled
+        cache_key = None
+        if self.cache_enabled:
+            cache_key = self._compute_cache_key(
+                df=df,
+                symbol=symbol,
+                timeframe=timeframe,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                sample_count=sample_count,
+            )
+            if cache_key in self._cache:
+                logger.debug(f"Cache hit for {symbol} ({timeframe}).")
+                return self._cache[cache_key], None
+
         x_df = context_df[["open", "high", "low", "close", "volume", "amount"]]
         x_timestamp = pd.to_datetime(context_df["timestamps"]).reset_index(drop=True)
 
@@ -285,6 +337,13 @@ class KronosAdapter:
                 "temperature": temperature,
             },
         )
+
+        if self.cache_enabled and cache_key:
+            if len(self._cache) >= self.max_cache_entries:
+                # Evict oldest entry (FIFO)
+                oldest_key = next(iter(self._cache))
+                del self._cache[oldest_key]
+            self._cache[cache_key] = pred_res
 
         logger.info(f"Generated {self.pred_len}-step forecast for {symbol} ({timeframe}) in {latency_sec:.2f}s.")
         return pred_res, None
