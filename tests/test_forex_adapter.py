@@ -143,3 +143,38 @@ def test_real_kronos_model_inference():
     assert (highs >= lows).all(), "Predicted High prices are less than Low prices"
     assert "latency_sec" in pred_res.metadata
     assert pred_res.metadata["latency_sec"] > 0
+
+
+def test_forecast_cache_hits_misses_and_clearing():
+    adapter = KronosAdapter(
+        model_name="NeoQuasar/Kronos-small",
+        tokenizer_name="NeoQuasar/Kronos-Tokenizer-base",
+        device="cpu",
+        lookback=400,
+        pred_len=120
+    )
+    ok, msg = adapter.load_model()
+    assert ok is True
+
+    df1 = create_sample_bars_df(count=400)
+
+    # 1. First call (Uncached)
+    adapter.clear_cache()
+    pred1, err1 = adapter.predict_forecast(df1, symbol="EURUSD", timeframe="M5")
+    assert err1 is None
+
+    # 2. Second call (Cache Hit)
+    pred2, err2 = adapter.predict_forecast(df1, symbol="EURUSD", timeframe="M5")
+    assert err2 is None
+    assert pred1.predicted_close == pred2.predicted_close
+
+    # 3. Third call on modified data (Cache Miss)
+    df2 = df1.copy()
+    df2.loc[399, "close"] += 0.0010
+    pred3, err3 = adapter.predict_forecast(df2, symbol="EURUSD", timeframe="M5")
+    assert err3 is None
+    assert pred1.predicted_close != pred3.predicted_close
+
+    # 4. Clear cache and verify re-calculation
+    adapter.clear_cache()
+    assert len(adapter._cache) == 0
