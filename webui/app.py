@@ -798,11 +798,12 @@ def autotrade_status():
     return jsonify(autotrader_controller.get_status())
 
 if __name__ == '__main__':
-    print("Starting Astraea MT5 Web UI...")
+    port = int(os.environ.get("FLASK_RUN_PORT", 7071))
+    print(f"Starting Astraea MT5 Web UI on port {port}...")
     print(f"Model availability: {MODEL_AVAILABLE}")
     if MODEL_AVAILABLE:
         print("Tip: You can load Kronos model through /api/load-model endpoint")
     else:
         print("Tip: Will use simulated data for demonstration")
 
-    app.run(debug=True, host='0.0.0.0', port=7070)
+    app.run(debug=True, host='0.0.0.0', port=port)
