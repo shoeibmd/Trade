@@ -21,6 +21,12 @@ except ImportError:
     MODEL_AVAILABLE = False
     print("Warning: Kronos model cannot be imported, will use simulated data for demonstration")
 
+try:
+    from trading.auto_trader import AutoTradingController, AutoTraderConfig
+    autotrader_controller = AutoTradingController()
+except ImportError:
+    autotrader_controller = None
+
 app = Flask(__name__)
 CORS(app)
 
@@ -743,6 +749,53 @@ def get_health():
         "live_trading_enabled": False,
         "timestamp": datetime.datetime.now().isoformat()
     })
+
+@app.route('/api/autotrade/start', methods=['POST'])
+def autotrade_start():
+    if not autotrader_controller:
+        return jsonify({"success": False, "error": "AutoTrader Controller not available"}), 500
+
+    data = request.get_json() or {}
+    symbol = data.get("symbol", "EURUSD")
+    timeframe = data.get("timeframe", "M5")
+    manual_lot = data.get("manual_lot_size")
+
+    if manual_lot is not None:
+        try:
+            manual_lot = float(manual_lot)
+            ok_lot, lot_msg = autotrader_controller.validate_manual_lot_size(manual_lot)
+            if not ok_lot:
+                return jsonify({"success": False, "error": f"Invalid manual lot size: {lot_msg}"}), 400
+            autotrader_controller.config.manual_lot_size = manual_lot
+        except ValueError:
+            return jsonify({"success": False, "error": "Invalid lot size format"}), 400
+
+    autotrader_controller.config.symbol = symbol
+    autotrader_controller.config.timeframe = timeframe
+
+    ok, msg = autotrader_controller.start_trading()
+    if ok:
+        return jsonify({"success": True, "message": msg, "status": autotrader_controller.get_status()})
+    else:
+        return jsonify({"success": False, "error": msg}), 400
+
+@app.route('/api/autotrade/stop', methods=['POST'])
+def autotrade_stop():
+    if not autotrader_controller:
+        return jsonify({"success": False, "error": "AutoTrader Controller not available"}), 500
+
+    ok, msg = autotrader_controller.stop_trading()
+    if ok:
+        return jsonify({"success": True, "message": msg, "status": autotrader_controller.get_status()})
+    else:
+        return jsonify({"success": False, "error": msg}), 400
+
+@app.route('/api/autotrade/status', methods=['GET'])
+def autotrade_status():
+    if not autotrader_controller:
+        return jsonify({"is_running": False, "error": "AutoTrader Controller not available"}), 500
+
+    return jsonify(autotrader_controller.get_status())
 
 if __name__ == '__main__':
     print("Starting Astraea MT5 Web UI...")
