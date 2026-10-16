@@ -703,6 +703,47 @@ def get_model_status():
             'message': 'Kronos model library not available, please install related dependencies'
         })
 
+@app.route('/api/overview')
+def get_overview():
+    return jsonify({
+        "status": "online",
+        "system_mode": "PAPER",
+        "live_trading_enabled": False,
+        "active_symbol": "EURUSD",
+        "timeframe": "M5",
+        "active_positions": 0
+    })
+
+@app.route('/api/signals')
+def get_signals():
+    return jsonify({
+        "signals": [],
+        "count": 0
+    })
+
+@app.route('/api/positions')
+def get_positions():
+    return jsonify({
+        "positions": [],
+        "count": 0
+    })
+
+@app.route('/api/history')
+def get_history():
+    return jsonify({
+        "history": [],
+        "count": 0
+    })
+
+@app.route('/api/health')
+def get_health():
+    return jsonify({
+        "status": "healthy",
+        "system_mode": "PAPER",
+        "live_trading_enabled": False,
+        "timestamp": datetime.datetime.now().isoformat()
+    })
+
 if __name__ == '__main__':
     print("Starting Astraea MT5 Web UI...")
     print(f"Model availability: {MODEL_AVAILABLE}")

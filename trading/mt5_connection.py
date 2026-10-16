@@ -121,6 +121,12 @@ class MT5GatewayClient:
             return data.get("terminal_info")
         return None
 
+    def get_mt5_module(self):
+        """Returns the active MetaTrader5 Python module object if available in NATIVE mode."""
+        if self.mode == MT5ConnectionMode.NATIVE and MT5_AVAILABLE:
+            return mt5
+        return None
+
     def get_account_info(self) -> Optional[Dict[str, Any]]:
         ok, data = self._request("GET", "/api/v1/account_info")
         if ok and isinstance(data, dict):

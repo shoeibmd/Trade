@@ -155,7 +155,7 @@ class ForexBacktester:
         i = lookback
         while i < total_bars:
             current_bar = df.iloc[i]
-            bar_time = current_bar["timestamps"] if "timestamps" in current_bar else datetime.now()
+            bar_time = current_bar["timestamps"] if "timestamps" in current_bar else (current_bar.name if isinstance(current_bar.name, datetime) else datetime.fromtimestamp(i * 300))
 
             # Day rollover check for daily loss calculation
             if i > lookback:
